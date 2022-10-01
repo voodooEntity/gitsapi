@@ -4,3 +4,9 @@ github.com/voodooEntity/gits v0.0.6-0.20220813111141-e7ca50c71be9 h1:4Ow+F3f7Vj5
 github.com/voodooEntity/gits v0.0.6-0.20220813111141-e7ca50c71be9/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
 github.com/voodooEntity/gits v0.0.10 h1:6lvK+1bcyc1MsnQhTMAXTDWmsnFoPviN/77kh5cPh9c=
 github.com/voodooEntity/gits v0.0.10/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+github.com/voodooEntity/gits v0.0.11 h1:HnlNoOCcbhi3Q7go3SQdPRG08Tnoj6Nu+wNVuVuS6g0=
+github.com/voodooEntity/gits v0.0.11/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+github.com/voodooEntity/gits v0.0.12 h1:jALuRACb6nlrMVTVbxKnwHGziWju7v/d5LygnLbEWzk=
+github.com/voodooEntity/gits v0.0.12/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+github.com/voodooEntity/gits v0.0.13 h1:/X9+IyzB2XMY+z5Hnr1VEUf47XqzTnIDyIST1Xy7xEw=
+github.com/voodooEntity/gits v0.0.13/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=

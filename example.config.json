@@ -1,0 +1,8 @@
+{
+  "HOST": "127.0.0.1",
+  "PORT": "8090",
+  "PERSISTENCE": "active",
+  "LOG_TARGET" : "stdout",
+  "LOG_PATH" : "out.log",
+  "LOG_LEVEL" : "debug"
+}
