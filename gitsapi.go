@@ -15,22 +15,23 @@ import (
 	"github.com/voodooEntity/gits"
 )
 
+var ServeMux = http.NewServeMux()
+
 func Start() {
 	archivist.Info("> Bootin HTTP API")
-	h := http.NewServeMux()
 
 	// Route: /v1/ping
-	h.HandleFunc("/v1/ping", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/ping", func(w http.ResponseWriter, r *http.Request) {
 		respond("pong", 200, w)
 	})
 
 	// Route: /v1/auth
-	h.HandleFunc("/v1/auth", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/auth", func(w http.ResponseWriter, r *http.Request) {
 
 	})
 
 	// Route: /v1/mapJson
-	h.HandleFunc("/v1/mapJson", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/mapJson", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -72,7 +73,7 @@ func Start() {
 	})
 
 	// Route: /v1/query
-	h.HandleFunc("/v1/query", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/query", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -113,7 +114,7 @@ func Start() {
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 
 	// Route: /v1/getEntityByTypeAndId
-	h.HandleFunc("/v1/getEntityByTypeAndId", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getEntityByTypeAndId", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -185,7 +186,7 @@ func Start() {
 	})
 
 	// Route: /v1/createEntity
-	h.HandleFunc("/v1/createEntity", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/createEntity", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -247,7 +248,7 @@ func Start() {
 	})
 
 	// Route: /v1/getEntitiesByType
-	h.HandleFunc("/v1/getEntitiesByType", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getEntitiesByType", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -311,7 +312,7 @@ func Start() {
 	})
 
 	// Route: /v1/getEntitiesByTypeAndValue
-	h.HandleFunc("/v1/getEntitiesByTypeAndValue", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getEntitiesByTypeAndValue", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -384,7 +385,7 @@ func Start() {
 	})
 
 	// Route: /v1/deleteEntity
-	h.HandleFunc("/v1/deleteEntity", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/deleteEntity", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -430,7 +431,7 @@ func Start() {
 	})
 
 	// Route: /v1/updateEntity
-	h.HandleFunc("/v1/updateEntity", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/updateEntity", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -484,7 +485,7 @@ func Start() {
 	})
 
 	// Route: /v1/getChildEntities
-	h.HandleFunc("/v1/getChildEntities", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getChildEntities", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -567,7 +568,7 @@ func Start() {
 	})
 
 	// Route: /v1/getParentEntities
-	h.HandleFunc("/v1/getParentEntities", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getParentEntities", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -650,7 +651,7 @@ func Start() {
 	})
 
 	// Route: /v1/getRelationsTo
-	h.HandleFunc("/v1/getRelationsTo", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getRelationsTo", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -733,7 +734,7 @@ func Start() {
 	})
 
 	// Route: /v1/getRelationsFrom
-	h.HandleFunc("/v1/getRelationsFrom", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getRelationsFrom", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -816,7 +817,7 @@ func Start() {
 	})
 
 	// Route: /v1/getRelation
-	h.HandleFunc("/v1/getRelation", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getRelation", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -895,7 +896,7 @@ func Start() {
 	})
 
 	// Route: /v1/getEntitiesByValue
-	h.HandleFunc("/v1/getEntitiesByValue", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getEntitiesByValue", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -969,7 +970,7 @@ func Start() {
 	})
 
 	// Route: /v1/getEntityTypes
-	h.HandleFunc("/v1/getEntityTypes", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/getEntityTypes", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -996,7 +997,7 @@ func Start() {
 	})
 
 	// Route: /v1/updateRelation
-	h.HandleFunc("/v1/updateRelation", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/updateRelation", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -1056,7 +1057,7 @@ func Start() {
 	})
 
 	// Route: /v1/createRelation
-	h.HandleFunc("/v1/createRelation", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/createRelation", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -1111,7 +1112,7 @@ func Start() {
 	})
 
 	// Route: /v1/createRelation
-	h.HandleFunc("/v1/deleteRelation", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/deleteRelation", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -1176,7 +1177,7 @@ func Start() {
 	// CUSTOMS (seperator)
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 	// Route: /v1/statistics/getEntityAmount
-	h.HandleFunc("/v1/statistics/getEntityAmount", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/statistics/getEntityAmount", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -1188,7 +1189,7 @@ func Start() {
 	})
 
 	// Route: /v1/statistics/getEntityAmountByType
-	h.HandleFunc("/v1/statistics/getEntityAmountByType", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/statistics/getEntityAmountByType", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -1218,7 +1219,7 @@ func Start() {
 	})
 
 	// Route: /v1/statistics/getAmountPersistencePayloadsPending
-	h.HandleFunc("/v1/statistics/getAmountPersistencePayloadsPending", func(w http.ResponseWriter, r *http.Request) {
+	ServeMux.HandleFunc("/v1/statistics/getAmountPersistencePayloadsPending", func(w http.ResponseWriter, r *http.Request) {
 		if "OPTIONS" == r.Method {
 			respond("", 200, w)
 			return
@@ -1234,15 +1235,15 @@ func Start() {
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 
 	// Route: /v1/template
-	//h.HandleFunc("/v1/template", func(w http.ResponseWriter, r *http.Request) {
+	//ServeMux.HandleFunc("/v1/template", func(w http.ResponseWriter, r *http.Request) {
 	//	fmt.Fprintln(w, "Hello, you hit foo!")
 	//})
 
 	// building server listen string by
 	// config values and print it - than listen
-	connectString := buildHttpListenConfigString()
+	connectString := buildListenConfigString()
 	archivist.Info("> Server listening settings by config (" + connectString + ")")
-	http.ListenAndServeTLS(connectString, config.GetValue("SSL_CERT_FILE"), config.GetValue("SSL_KEY_FILE"), h)
+	http.ListenAndServeTLS(connectString, config.GetValue("SSL_CERT_FILE"), config.GetValue("SSL_KEY_FILE"), ServeMux)
 }
 
 func getOptionalUrlParams(optionalUrlParams map[string]string, urlParams map[string]string, r *http.Request) map[string]string {
@@ -1316,7 +1317,7 @@ func getRequestBody(r *http.Request) ([]byte, error) {
 	return body, nil
 }
 
-func buildHttpListenConfigString() string {
+func buildListenConfigString() string {
 	var connectString string
 	connectString += config.GetValue("HOST")
 	connectString += ":"
