@@ -12,3 +12,9 @@ github.com/voodooEntity/gits v0.0.13 h1:/X9+IyzB2XMY+z5Hnr1VEUf47XqzTnIDyIST1Xy7
 github.com/voodooEntity/gits v0.0.13/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
 github.com/voodooEntity/gits v0.0.14 h1:A7RSqdSTiFcI/olut3PZIhoBGgZsstb53dhr1Xx+ErA=
 github.com/voodooEntity/gits v0.0.14/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+github.com/voodooEntity/gits v0.0.15 h1:prTZ8yKzdRRphMRFcRIBSWnUFQxScKnDTsqmqK+qB9I=
+github.com/voodooEntity/gits v0.0.15/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+github.com/voodooEntity/gits v0.0.16 h1:twNuv6z6YD/PTs7lzugJamYpMv1jBd2/FoviVVJO+4s=
+github.com/voodooEntity/gits v0.0.16/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+github.com/voodooEntity/gits v0.0.17 h1:1FG0cxU4XKngP7T7sEmdgJt5y1pH3Tios4leoFJCvpY=
+github.com/voodooEntity/gits v0.0.17/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=

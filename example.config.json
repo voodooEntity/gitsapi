@@ -4,5 +4,9 @@
   "PERSISTENCE": "active",
   "LOG_TARGET" : "stdout",
   "LOG_PATH" : "out.log",
-  "LOG_LEVEL" : "debug"
+  "LOG_LEVEL" : "debug",
+  "CORS_HEADER" : "*",
+  "CORS_ORIGIN" : "*",
+  "SSL_CERT_FILE" : "",
+  "SSL_KEY_FILE" : ""
 }

@@ -24,8 +24,18 @@ func Start() {
 		respond("pong", 200, w)
 	})
 
+	// Route: /v1/auth
+	h.HandleFunc("/v1/auth", func(w http.ResponseWriter, r *http.Request) {
+
+	})
+
 	// Route: /v1/mapJson
 	h.HandleFunc("/v1/mapJson", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "POST" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -43,8 +53,8 @@ func Start() {
 		// unpack the json
 		var transportData transport.TransportEntity
 		if err := json.Unmarshal(body, &transportData); err != nil {
-			archivist.Error("Invalid json query object", errors.New("Invalid Json"))
-			http.Error(w, "Invalid json query object ", 422)
+			archivist.Error("Invalid json query object", err.Error())
+			http.Error(w, "Invalid json query object "+err.Error(), 422)
 			return
 		}
 
@@ -63,6 +73,11 @@ func Start() {
 
 	// Route: /v1/query
 	h.HandleFunc("/v1/query", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "POST" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -79,8 +94,9 @@ func Start() {
 
 		// unpack the json
 		var qry query.Query
-		if err := json.Unmarshal(body, &qry); err != nil {
-			archivist.Error("Invalid json query object", errors.New("Invalid Json"))
+		err = json.Unmarshal(body, &qry)
+		if err != nil {
+			archivist.Error("Invalid json query object", err.Error())
 			http.Error(w, "Invalid json query object ", 422)
 			return
 		}
@@ -88,10 +104,6 @@ func Start() {
 		// lets pass the body to our mapper
 		// that will recursive map the entities
 		responseData := query.Execute(&qry)
-		if nil != err {
-			http.Error(w, err.Error(), 422)
-			return
-		}
 
 		respondOk(responseData, w)
 	})
@@ -102,6 +114,11 @@ func Start() {
 
 	// Route: /v1/getEntityByTypeAndId
 	h.HandleFunc("/v1/getEntityByTypeAndId", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -169,6 +186,11 @@ func Start() {
 
 	// Route: /v1/createEntity
 	h.HandleFunc("/v1/createEntity", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "POST" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -226,6 +248,11 @@ func Start() {
 
 	// Route: /v1/getEntitiesByType
 	h.HandleFunc("/v1/getEntitiesByType", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 403)
@@ -285,6 +312,11 @@ func Start() {
 
 	// Route: /v1/getEntitiesByTypeAndValue
 	h.HandleFunc("/v1/getEntitiesByTypeAndValue", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -353,6 +385,11 @@ func Start() {
 
 	// Route: /v1/deleteEntity
 	h.HandleFunc("/v1/deleteEntity", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "DELETE" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -394,6 +431,11 @@ func Start() {
 
 	// Route: /v1/updateEntity
 	h.HandleFunc("/v1/updateEntity", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "PUT" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -443,6 +485,11 @@ func Start() {
 
 	// Route: /v1/getChildEntities
 	h.HandleFunc("/v1/getChildEntities", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -521,6 +568,11 @@ func Start() {
 
 	// Route: /v1/getParentEntities
 	h.HandleFunc("/v1/getParentEntities", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -599,6 +651,11 @@ func Start() {
 
 	// Route: /v1/getRelationsTo
 	h.HandleFunc("/v1/getRelationsTo", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -677,6 +734,11 @@ func Start() {
 
 	// Route: /v1/getRelationsFrom
 	h.HandleFunc("/v1/getRelationsFrom", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -755,6 +817,11 @@ func Start() {
 
 	// Route: /v1/getRelation
 	h.HandleFunc("/v1/getRelation", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -829,6 +896,11 @@ func Start() {
 
 	// Route: /v1/getEntitiesByValue
 	h.HandleFunc("/v1/getEntitiesByValue", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -898,6 +970,11 @@ func Start() {
 
 	// Route: /v1/getEntityTypes
 	h.HandleFunc("/v1/getEntityTypes", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "GET" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -920,6 +997,11 @@ func Start() {
 
 	// Route: /v1/updateRelation
 	h.HandleFunc("/v1/updateRelation", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "PUT" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -975,6 +1057,11 @@ func Start() {
 
 	// Route: /v1/createRelation
 	h.HandleFunc("/v1/createRelation", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "POST" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -1025,6 +1112,11 @@ func Start() {
 
 	// Route: /v1/createRelation
 	h.HandleFunc("/v1/deleteRelation", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// check http method
 		if "DELETE" != r.Method {
 			http.Error(w, "Invalid http method for this path", 422)
@@ -1085,6 +1177,11 @@ func Start() {
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 	// Route: /v1/statistics/getEntityAmount
 	h.HandleFunc("/v1/statistics/getEntityAmount", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
 		amount := gits.GetEntityAmount()
 		respond(strconv.Itoa(amount), 200, w)
@@ -1092,6 +1189,11 @@ func Start() {
 
 	// Route: /v1/statistics/getEntityAmountByType
 	h.HandleFunc("/v1/statistics/getEntityAmountByType", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// first we get the params
 		requiredUrlParams := make(map[string]string)
 		requiredUrlParams["type"] = ""
@@ -1117,6 +1219,11 @@ func Start() {
 
 	// Route: /v1/statistics/getAmountPersistencePayloadsPending
 	h.HandleFunc("/v1/statistics/getAmountPersistencePayloadsPending", func(w http.ResponseWriter, r *http.Request) {
+		if "OPTIONS" == r.Method {
+			respond("", 200, w)
+			return
+		}
+
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
 		amount := gits.GetAmountPersistencePayloadsPending()
 		respond(strconv.Itoa(amount), 200, w)
@@ -1135,7 +1242,7 @@ func Start() {
 	// config values and print it - than listen
 	connectString := buildHttpListenConfigString()
 	archivist.Info("> Server listening settings by config (" + connectString + ")")
-	http.ListenAndServe(connectString, h)
+	http.ListenAndServeTLS(connectString, config.GetValue("SSL_CERT_FILE"), config.GetValue("SSL_KEY_FILE"), h)
 }
 
 func getOptionalUrlParams(optionalUrlParams map[string]string, urlParams map[string]string, r *http.Request) map[string]string {
@@ -1162,8 +1269,19 @@ func getRequiredUrlParams(requiredUrlParams map[string]string, r *http.Request) 
 }
 
 func respond(message string, responseCode int, w http.ResponseWriter) {
+
+	corsAllowHeaders := config.GetValue("CORS_HEADER")
+	if "" != corsAllowHeaders {
+		w.Header().Add("Access-Control-Allow-Headers", corsAllowHeaders)
+	}
+	corsAllowOrigin := config.GetValue("CORS_ORIGIN")
+	if "" != corsAllowOrigin {
+		w.Header().Add("Access-Control-Allow-Headers", corsAllowOrigin)
+	}
+
 	w.WriteHeader(responseCode)
 	messageBytes := []byte(message)
+
 	_, err := w.Write(messageBytes)
 	if nil != err {
 		archivist.Error("Could not write http response body ", err, message)
@@ -1180,6 +1298,8 @@ func respondOk(data transport.Transport, w http.ResponseWriter) {
 	}
 
 	// finally we gonne send our response
+	w.Header().Add("Access-Control-Allow-Headers", "*")
+	w.Header().Add("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(200)
 	_, err = w.Write(responseData)
 	if nil != err {
