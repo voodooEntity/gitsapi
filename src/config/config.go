@@ -8,7 +8,7 @@ import (
 )
 
 var Data = make(map[string]string)
-var requiredConfigs = [6]string{"HOST", "PORT", "PERSISTENCE", "LOG_TARGET", "LOG_PATH", "LOG_LEVEL"}
+var requiredConfigs = [10]string{"HOST", "PORT", "PERSISTENCE", "LOG_TARGET", "LOG_PATH", "LOG_LEVEL", "CORS_HEADER", "CORS_ORIGIN", "SSL_CERT_FILE", "SSL_KEY_FILE"}
 
 func Init() {
 	// first lets check if there is a parseable config file
