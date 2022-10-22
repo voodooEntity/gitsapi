@@ -18,3 +18,5 @@ github.com/voodooEntity/gits v0.0.16 h1:twNuv6z6YD/PTs7lzugJamYpMv1jBd2/FoviVVJO
 github.com/voodooEntity/gits v0.0.16/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
 github.com/voodooEntity/gits v0.0.17 h1:1FG0cxU4XKngP7T7sEmdgJt5y1pH3Tios4leoFJCvpY=
 github.com/voodooEntity/gits v0.0.17/go.mod h1:8spOvNEi3UeUTqbRtZZaYmUUVMBmvrR/k6LMOIkbXkc=
+golang.org/x/crypto v0.1.0 h1:MDRAIl0xIo9Io2xV565hzXHw3zVseKrJKodhohM5CjU=
+golang.org/x/crypto v0.1.0/go.mod h1:RecgLatLF4+eUMCP1PoPZQb+cVrJcOPbHkTkbkB9sbw=

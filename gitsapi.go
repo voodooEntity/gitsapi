@@ -3,10 +3,13 @@ package gitsapi
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/voodooEntity/gits/src/query"
 	"github.com/voodooEntity/gits/src/transport"
 	"github.com/voodooEntity/gits/src/types"
+	"github.com/voodooEntity/gitsapi/src/auth"
 	"github.com/voodooEntity/gitsapi/src/config"
+	"github.com/voodooEntity/gitsapi/src/user"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -19,22 +22,25 @@ var ServeMux = http.NewServeMux()
 
 func Start() {
 	archivist.Info("> Bootin HTTP API")
+	auth.Setup()
 
 	// Route: /v1/ping
 	ServeMux.HandleFunc("/v1/ping", func(w http.ResponseWriter, r *http.Request) {
 		respond("pong", 200, w)
 	})
 
-	// Route: /v1/auth
-	ServeMux.HandleFunc("/v1/auth", func(w http.ResponseWriter, r *http.Request) {
-
-	})
-
 	// Route: /v1/mapJson
 	ServeMux.HandleFunc("/v1/mapJson", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -74,9 +80,16 @@ func Start() {
 
 	// Route: /v1/query
 	ServeMux.HandleFunc("/v1/query", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -115,9 +128,16 @@ func Start() {
 
 	// Route: /v1/getEntityByTypeAndId
 	ServeMux.HandleFunc("/v1/getEntityByTypeAndId", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -187,9 +207,16 @@ func Start() {
 
 	// Route: /v1/createEntity
 	ServeMux.HandleFunc("/v1/createEntity", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -249,9 +276,16 @@ func Start() {
 
 	// Route: /v1/getEntitiesByType
 	ServeMux.HandleFunc("/v1/getEntitiesByType", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -313,9 +347,16 @@ func Start() {
 
 	// Route: /v1/getEntitiesByTypeAndValue
 	ServeMux.HandleFunc("/v1/getEntitiesByTypeAndValue", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -386,9 +427,16 @@ func Start() {
 
 	// Route: /v1/deleteEntity
 	ServeMux.HandleFunc("/v1/deleteEntity", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -432,9 +480,16 @@ func Start() {
 
 	// Route: /v1/updateEntity
 	ServeMux.HandleFunc("/v1/updateEntity", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -486,9 +541,16 @@ func Start() {
 
 	// Route: /v1/getChildEntities
 	ServeMux.HandleFunc("/v1/getChildEntities", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -569,9 +631,16 @@ func Start() {
 
 	// Route: /v1/getParentEntities
 	ServeMux.HandleFunc("/v1/getParentEntities", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -652,9 +721,16 @@ func Start() {
 
 	// Route: /v1/getRelationsTo
 	ServeMux.HandleFunc("/v1/getRelationsTo", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -735,9 +811,16 @@ func Start() {
 
 	// Route: /v1/getRelationsFrom
 	ServeMux.HandleFunc("/v1/getRelationsFrom", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -818,9 +901,16 @@ func Start() {
 
 	// Route: /v1/getRelation
 	ServeMux.HandleFunc("/v1/getRelation", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -897,9 +987,16 @@ func Start() {
 
 	// Route: /v1/getEntitiesByValue
 	ServeMux.HandleFunc("/v1/getEntitiesByValue", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -971,9 +1068,16 @@ func Start() {
 
 	// Route: /v1/getEntityTypes
 	ServeMux.HandleFunc("/v1/getEntityTypes", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -998,9 +1102,16 @@ func Start() {
 
 	// Route: /v1/updateRelation
 	ServeMux.HandleFunc("/v1/updateRelation", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -1058,9 +1169,16 @@ func Start() {
 
 	// Route: /v1/createRelation
 	ServeMux.HandleFunc("/v1/createRelation", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -1113,9 +1231,16 @@ func Start() {
 
 	// Route: /v1/createRelation
 	ServeMux.HandleFunc("/v1/deleteRelation", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// check http method
@@ -1174,13 +1299,64 @@ func Start() {
 	})
 
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
-	// CUSTOMS (seperator)
+	// Auth / User
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+
+	// Route: /v1/auth
+	ServeMux.HandleFunc("/v1/auth", func(w http.ResponseWriter, r *http.Request) {
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
+		}
+
+		// check http method
+		if "POST" != r.Method {
+			http.Error(w, "Invalid http method for this path", 422)
+			return
+		}
+
+		// retrieve data from request
+		body, err := getRequestBody(r)
+		if nil != err {
+			archivist.Error("Could not read http request body", err.Error())
+			http.Error(w, "Malformed or no body. ", 422)
+			return
+		}
+
+		var usr user.User
+		if err := json.Unmarshal(body, &usr); err != nil {
+			archivist.Error("Invalid json query object", err.Error())
+			http.Error(w, "Invalid json query object "+err.Error(), 422)
+			return
+		}
+		fmt.Println(usr)
+		token, err := auth.Login(usr.Name, usr.Password)
+		if nil != err {
+			archivist.Error("Could not login", err.Error())
+			http.Error(w, "Could not login. ", 422)
+			return
+		}
+
+		// finally we gonne send our response
+		respond(token, 200, w)
+	})
+	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
+	// Stats
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 	// Route: /v1/statistics/getEntityAmount
 	ServeMux.HandleFunc("/v1/statistics/getEntityAmount", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
@@ -1190,9 +1366,16 @@ func Start() {
 
 	// Route: /v1/statistics/getEntityAmountByType
 	ServeMux.HandleFunc("/v1/statistics/getEntityAmountByType", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// first we get the params
@@ -1220,9 +1403,16 @@ func Start() {
 
 	// Route: /v1/statistics/getAmountPersistencePayloadsPending
 	ServeMux.HandleFunc("/v1/statistics/getAmountPersistencePayloadsPending", func(w http.ResponseWriter, r *http.Request) {
-		if "OPTIONS" == r.Method {
-			respond("", 200, w)
+		if !handleAuth(r) {
+			respond("", 401, w)
 			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
 		}
 
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
@@ -1323,4 +1513,24 @@ func buildListenConfigString() string {
 	connectString += ":"
 	connectString += config.GetValue("PORT")
 	return connectString
+}
+
+func handleAuth(r *http.Request) bool {
+	username := r.Header.Get("GITSAPI_AUTH_USER")
+	if "" == username {
+		archivist.Info("Trying to access API without username given")
+		return false
+	}
+
+	token := r.Header.Get("GITSAPI_AUTH_TOKEN")
+	if "" != token {
+		return auth.ValidateUserAuthToken(username, token)
+	}
+
+	apikey := r.Header.Get("GITSAPI_AUTH_APIKEY")
+	if "" != apikey {
+		return auth.ValidateApiKey(username, apikey)
+	}
+
+	return false
 }
