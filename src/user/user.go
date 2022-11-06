@@ -126,6 +126,26 @@ func Update(username string, password string, passwordControle string, apiKey st
 	return nil
 }
 
+func GetUserListBySearch(search string) transport.Transport {
+	ret := transport.Transport{
+		Entities: []transport.TransportEntity{},
+	}
+
+	users := query.Execute(query.New().Read("User").Match("Value", "contain", search))
+	if 0 < len(users.Entities) {
+		for _, user := range users.Entities {
+			ret.Entities = append(ret.Entities, transport.TransportEntity{
+				ID:      user.ID,
+				Value:   user.Value,
+				Context: user.Context,
+			})
+		}
+	}
+	return transport.Transport{
+		Entities: []transport.TransportEntity{},
+	}
+}
+
 func usernameExists(username string) bool {
 	ret, _ := gits.GetEntitiesByTypeAndValue("User", username, "match", "")
 	if 0 < len(ret) {

@@ -1421,6 +1421,45 @@ func Start() {
 		respond("", 200, w)
 	})
 
+	// Route: /v1/user/search
+	ServeMux.HandleFunc("/v1/user/search", func(w http.ResponseWriter, r *http.Request) {
+		if !handleAuth(r) {
+			respond("", 401, w)
+			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
+		}
+
+		// check http method
+		if "GET" != r.Method {
+			http.Error(w, "Invalid http method for this path", 403)
+			return
+		}
+
+		// first we get the params
+		requiredUrlParams := make(map[string]string)
+		requiredUrlParams["search"] = ""
+		urlParams, err := getRequiredUrlParams(requiredUrlParams, r)
+
+		// required params check
+		if nil != err {
+			// handle error
+			http.Error(w, err.Error(), 422)
+			return
+		}
+
+		// ok we seem to be fine on types, lets call the actual getter method
+		responseData := user.GetUserListBySearch(urlParams["search"])
+
+		// all seems fine lets return the data
+		respondOk(responseData, w)
+	})
+
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 	// Stats
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
