@@ -141,9 +141,7 @@ func GetUserListBySearch(search string) transport.Transport {
 			})
 		}
 	}
-	return transport.Transport{
-		Entities: []transport.TransportEntity{},
-	}
+	return ret
 }
 
 func usernameExists(username string) bool {
