@@ -15,34 +15,38 @@ type User struct {
 	ApiKey           string
 }
 
-func Create(username string, password string, passwordControle string, apiKey string) error {
+func Create(username string, password string, passwordControle string, apiKey string) (int, error) {
 	if usernameExists(username) {
-		return errors.New("Username already exists. Please choose a different one")
+		return -1, errors.New("Username already exists. Please choose a different one")
 	}
 
 	if 3 > len(username) {
-		return errors.New("Username is to short. Please use at least a username length of 3 characters or longer")
+		return -1, errors.New("Username is to short. Please use at least a username length of 3 characters or longer")
 	}
 
 	if 8 > len(password) {
-		return errors.New("Password is to short. Please use at least a username length of 8 characters or longer")
+		return -1, errors.New("Password is to short. Please use at least a username length of 8 characters or longer")
 	}
 
 	if password != passwordControle {
-		return errors.New("Password and controle password dont match. Please correct and retry")
+		return -1, errors.New("Password and controle password dont match. Please correct and retry")
 	}
 
-	passwordHash, _ := auth.HashPassword(password)
+	passwordHash, salt, err := auth.HashPassword(password)
+
+	if nil != err {
+		return -1, errors.New("failure in password hash generation progress.")
+	}
 
 	userEntity := transport.TransportEntity{
 		ID:         -1,
 		Value:      username,
-		Properties: map[string]string{"Password": passwordHash, "Token": "", "TokenTime": ""},
+		Properties: map[string]string{"Password": passwordHash, "Salt": salt, "Token": "", "TokenTime": ""},
 	}
 
 	if "" != apiKey {
 		if 18 < len(apiKey) {
-			return errors.New("Password and controle password dont match. Please correct and retry")
+			return -1, errors.New("Password and controle password dont match. Please correct and retry")
 		}
 
 		apiKeyEntity := transport.TransportEntity{
@@ -60,8 +64,8 @@ func Create(username string, password string, passwordControle string, apiKey st
 		}
 	}
 
-	gits.MapTransportData(userEntity)
-	return nil
+	user := gits.MapTransportData(userEntity)
+	return user.ID, nil
 }
 
 func Update(username string, password string, passwordControle string, apiKey string) error {
@@ -78,9 +82,13 @@ func Update(username string, password string, passwordControle string, apiKey st
 			return errors.New("Password and controle password dont match. Please correct and retry")
 		}
 
-		passwordHash, _ := auth.HashPassword(password)
+		passwordHash, salt, err := auth.HashPassword(password)
 
-		qry := query.New().Update("User").Match("Value", "==", username).Set("Properties.Password", passwordHash)
+		if nil != err {
+			return errors.New("failure in password hash generation progress.")
+		}
+
+		qry := query.New().Update("User").Match("Value", "==", username).Set("Properties.Password", passwordHash).Set("Properties.Salt", salt)
 		query.Execute(qry)
 	}
 
@@ -89,11 +97,53 @@ func Update(username string, password string, passwordControle string, apiKey st
 			return errors.New("Password and controle password dont match. Please correct and retry")
 		}
 
-		qry := query.New().Update("ApiKey").Reduce("User").Match("Value", "==", username).Set("Value", apiKey)
-		query.Execute(qry)
+		// do we have an associated api token yet?
+		apiKeyEntity := query.Execute(query.New().Read("ApiKey").Reduce("User").Match("Value", "==", username))
+		if 0 < len(apiKeyEntity.Entities) {
+			query.Execute(query.New().Update("ApiKey").Match("ID", "==", string(apiKeyEntity.Entities[0].ID)).Set("Value", apiKey))
+		} else {
+			data := transport.TransportEntity{
+				ID:      0,
+				Type:    "User",
+				Value:   username,
+				Context: "",
+				ChildRelations: []transport.TransportRelation{
+					{
+						Context: "",
+						Target: transport.TransportEntity{
+							ID:      -1,
+							Type:    "ApiKey",
+							Value:   apiKey,
+							Context: "",
+						},
+					},
+				},
+			}
+			gits.MapTransportData(data)
+		}
 	}
 
 	return nil
+}
+
+func GetUserListBySearch(search string) transport.Transport {
+	ret := transport.Transport{
+		Entities: []transport.TransportEntity{},
+	}
+
+	users := query.Execute(query.New().Read("User").Match("Value", "contain", search))
+	if 0 < len(users.Entities) {
+		for _, user := range users.Entities {
+			ret.Entities = append(ret.Entities, transport.TransportEntity{
+				ID:      user.ID,
+				Value:   user.Value,
+				Context: user.Context,
+			})
+		}
+	}
+	return transport.Transport{
+		Entities: []transport.TransportEntity{},
+	}
 }
 
 func usernameExists(username string) bool {

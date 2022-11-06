@@ -3,7 +3,6 @@ package gitsapi
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/voodooEntity/gits/src/query"
 	"github.com/voodooEntity/gits/src/transport"
 	"github.com/voodooEntity/gits/src/types"
@@ -1302,8 +1301,8 @@ func Start() {
 	// Auth / User
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 
-	// Route: /v1/auth
-	ServeMux.HandleFunc("/v1/auth", func(w http.ResponseWriter, r *http.Request) {
+	// Route: /v1/user/auth
+	ServeMux.HandleFunc("/v1/user/auth", func(w http.ResponseWriter, r *http.Request) {
 		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
 			if "OPTIONS" == r.Method {
 				respond("", 200, w)
@@ -1331,7 +1330,7 @@ func Start() {
 			http.Error(w, "Invalid json query object "+err.Error(), 422)
 			return
 		}
-		fmt.Println(usr)
+
 		token, err := auth.Login(usr.Name, usr.Password)
 		if nil != err {
 			archivist.Error("Could not login", err.Error())
@@ -1342,6 +1341,125 @@ func Start() {
 		// finally we gonne send our response
 		respond(token, 200, w)
 	})
+
+	ServeMux.HandleFunc("/v1/user/create", func(w http.ResponseWriter, r *http.Request) {
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
+		}
+
+		// check http method
+		if "POST" != r.Method {
+			http.Error(w, "Invalid http method for this path", 422)
+			return
+		}
+
+		// retrieve data from request
+		body, err := getRequestBody(r)
+		if nil != err {
+			archivist.Error("Could not read http request body", err.Error())
+			http.Error(w, "Malformed or no body. ", 422)
+			return
+		}
+
+		var usr user.User
+		if err := json.Unmarshal(body, &usr); err != nil {
+			archivist.Error("Invalid json query object", err.Error())
+			http.Error(w, "Invalid json query object "+err.Error(), 422)
+			return
+		}
+
+		user, err := user.Create(usr.Name, usr.Password, usr.PasswordControle, usr.ApiKey)
+		if nil != err {
+			archivist.Error("Could not create user", err.Error())
+			http.Error(w, "could not create user. ", 422)
+			return
+		}
+
+		// finally we gonne send our response
+		respond(string(user), 200, w)
+	})
+
+	ServeMux.HandleFunc("/v1/user/update", func(w http.ResponseWriter, r *http.Request) {
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
+		}
+
+		// check http method
+		if "PUT" != r.Method {
+			http.Error(w, "Invalid http method for this path", 422)
+			return
+		}
+
+		// retrieve data from request
+		body, err := getRequestBody(r)
+		if nil != err {
+			archivist.Error("Could not read http request body", err.Error())
+			http.Error(w, "Malformed or no body. ", 422)
+			return
+		}
+
+		var usr user.User
+		if err := json.Unmarshal(body, &usr); err != nil {
+			archivist.Error("Invalid json query object", err.Error())
+			http.Error(w, "Invalid json query object "+err.Error(), 422)
+			return
+		}
+
+		if err = user.Update(usr.Name, usr.Password, usr.PasswordControle, usr.ApiKey); nil != err {
+			archivist.Error("Could not update user", err.Error())
+			http.Error(w, "could not update user.", 422)
+			return
+		}
+
+		// finally we gonne send our response
+		respond("", 200, w)
+	})
+
+	// Route: /v1/user/search
+	ServeMux.HandleFunc("/v1/user/search", func(w http.ResponseWriter, r *http.Request) {
+		if !handleAuth(r) {
+			respond("", 401, w)
+			return
+		}
+
+		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
+			if "OPTIONS" == r.Method {
+				respond("", 200, w)
+				return
+			}
+		}
+
+		// check http method
+		if "GET" != r.Method {
+			http.Error(w, "Invalid http method for this path", 403)
+			return
+		}
+
+		// first we get the params
+		requiredUrlParams := make(map[string]string)
+		requiredUrlParams["search"] = ""
+		urlParams, err := getRequiredUrlParams(requiredUrlParams, r)
+
+		// required params check
+		if nil != err {
+			// handle error
+			http.Error(w, err.Error(), 422)
+			return
+		}
+
+		// ok we seem to be fine on types, lets call the actual getter method
+		responseData := user.GetUserListBySearch(urlParams["search"])
+
+		// all seems fine lets return the data
+		respondOk(responseData, w)
+	})
+
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
 	// Stats
 	// -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -  -
@@ -1518,7 +1636,7 @@ func buildListenConfigString() string {
 func handleAuth(r *http.Request) bool {
 	username := r.Header.Get("GITSAPI_AUTH_USER")
 	if "" == username {
-		archivist.Info("Trying to access API without username given")
+		archivist.Info("trying to access API without username given.")
 		return false
 	}
 
