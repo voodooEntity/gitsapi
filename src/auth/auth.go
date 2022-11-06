@@ -7,6 +7,7 @@ import (
 	"github.com/voodooEntity/gits"
 	"github.com/voodooEntity/gits/src/query"
 	"github.com/voodooEntity/gits/src/transport"
+	"github.com/voodooEntity/gitsapi/src/config"
 	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"os"
@@ -15,36 +16,65 @@ import (
 )
 
 func Login(username string, password string) (string, error) {
-	entities, err := gits.GetEntitiesByTypeAndValue("User", username, "match", "")
+	user, err := gits.GetEntitiesByTypeAndValue("User", username, "match", "")
 	if nil != err {
 		return "", err
 	}
 
-	if 0 == len(entities) {
-		return "", errors.New("Unknown user given")
+	if 0 == len(user) {
+		return "", errors.New("Unknown user given.")
 	}
 
-	if !CheckPasswordHash(password, entities[0].Properties["Password"]) {
+	if !CheckPasswordHash(password+user[0].Properties["Salt"], user[0].Properties["Password"]) {
 		return "", errors.New("Wrong password given")
 	}
 
 	token := randomString(20)
-	query.Execute(query.New().Update("User").Match("Value", "==", username).Set("Properties.Token", token).Set("Properties.TokenTime", strconv.FormatInt(time.Now().UTC().UnixNano(), 10)))
+	gits.MapTransportData(transport.TransportEntity{
+		ID:    0,
+		Type:  "User",
+		Value: username,
+		ChildRelations: []transport.TransportRelation{
+			{
+				Context: "",
+				Target: transport.TransportEntity{
+					ID:         -1,
+					Type:       "Token",
+					Value:      token,
+					Properties: map[string]string{"time": strconv.FormatInt(time.Now().UTC().UnixNano(), 10)},
+				},
+			},
+		},
+	})
 
 	return token, nil
 }
 
 func ValidateUserAuthToken(username string, token string) bool {
-	ret := query.Execute(query.New().Read("User").Match("Value", "==", username).Match("Properties.Token", "==", token))
+	tokenLifetime, err := strconv.ParseInt(config.GetValue("TOKEN_LIFETIME"), 10, 64)
+	if nil != err {
+		archivist.Error("invalid token lifetime given. exiting .", tokenLifetime)
+		os.Exit(0)
+		return false
+	}
+	query.Execute(query.New().Read("User").Match("Value", "==", username))
+
+	checkTime := strconv.FormatInt(time.Now().UTC().UnixNano()-tokenLifetime, 10)
+	ret := query.Execute(
+		query.New().Read("User").Match("Value", "==", username).To(
+			query.New().Read("Token").Match("Value", "==", token).Match("time", ">", checkTime),
+		),
+	)
 	if 0 == len(ret.Entities) {
 		return false
 	}
 	return true
 }
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+func HashPassword(password string) (string, string, error) {
+	salt := randomString(20)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password+salt), 14)
+	return string(bytes), salt, err
 }
 
 func CheckPasswordHash(password, hash string) bool {
@@ -68,7 +98,7 @@ func ValidateApiKey(username string, apikey string) bool {
 func Setup() {
 	ret := query.Execute(query.New().Read("User"))
 	if 0 == len(ret.Entities) {
-		defaultPwd, err := HashPassword("logmein")
+		defaultPwd, salt, err := HashPassword("logmein")
 		if nil != err {
 			archivist.Info("Problem using bcrypt - exiting server due to possible vulnerabilities if proceeding")
 			os.Exit(0)
@@ -79,7 +109,7 @@ func Setup() {
 			Type:       "User",
 			Value:      "default",
 			Context:    "autoinserted",
-			Properties: map[string]string{"Password": defaultPwd},
+			Properties: map[string]string{"Password": defaultPwd, "Salt": salt},
 		})
 		archivist.Info("Created default user")
 	}

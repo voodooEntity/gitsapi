@@ -8,5 +8,6 @@
   "CORS_HEADER" : "*",
   "CORS_ORIGIN" : "*",
   "SSL_CERT_FILE" : "",
-  "SSL_KEY_FILE" : ""
+  "SSL_KEY_FILE" : "",
+  "TOKEN_LIFETIME" : "3600"
 }
