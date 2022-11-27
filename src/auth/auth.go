@@ -41,7 +41,7 @@ func Login(username string, password string) (string, error) {
 					ID:         -1,
 					Type:       "Token",
 					Value:      token,
-					Properties: map[string]string{"time": strconv.FormatInt(time.Now().UTC().UnixNano(), 10)},
+					Properties: map[string]string{"time": strconv.FormatInt(time.Now().UTC().Unix(), 10)},
 				},
 			},
 		},
@@ -59,7 +59,7 @@ func ValidateUserAuthToken(username string, token string) bool {
 	}
 	query.Execute(query.New().Read("User").Match("Value", "==", username))
 
-	checkTime := strconv.FormatInt(time.Now().UTC().UnixNano()-tokenLifetime, 10)
+	checkTime := strconv.FormatInt(time.Now().UTC().Unix()-tokenLifetime, 10)
 	ret := query.Execute(
 		query.New().Read("User").Match("Value", "==", username).To(
 			query.New().Read("Token").Match("Value", "==", token).Match("time", ">", checkTime),
