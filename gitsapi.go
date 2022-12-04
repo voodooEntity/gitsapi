@@ -30,16 +30,16 @@ func Start() {
 
 	// Route: /v1/mapJson
 	ServeMux.HandleFunc("/v1/mapJson", func(w http.ResponseWriter, r *http.Request) {
-		if !handleAuth(r) {
-			respond("", 401, w)
-			return
-		}
-
 		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
 			if "OPTIONS" == r.Method {
 				respond("", 200, w)
 				return
 			}
+		}
+
+		if !handleAuth(r) {
+			respond("", 401, w)
+			return
 		}
 
 		// check http method
@@ -79,16 +79,16 @@ func Start() {
 
 	// Route: /v1/query
 	ServeMux.HandleFunc("/v1/query", func(w http.ResponseWriter, r *http.Request) {
-		if !handleAuth(r) {
-			respond("", 401, w)
-			return
-		}
-
 		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
 			if "OPTIONS" == r.Method {
 				respond("", 200, w)
 				return
 			}
+		}
+
+		if !handleAuth(r) {
+			respond("", 401, w)
+			return
 		}
 
 		// check http method
@@ -1585,7 +1585,7 @@ func respond(message string, responseCode int, w http.ResponseWriter) {
 	}
 	corsAllowOrigin := config.GetValue("CORS_ORIGIN")
 	if "" != corsAllowOrigin {
-		w.Header().Add("Access-Control-Allow-Headers", corsAllowOrigin)
+		w.Header().Add("Access-Control-Allow-Origin", corsAllowOrigin)
 	}
 
 	w.WriteHeader(responseCode)
