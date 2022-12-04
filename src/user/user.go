@@ -9,6 +9,7 @@ import (
 )
 
 type User struct {
+	ID               int
 	Name             string
 	Password         string
 	PasswordControle string
@@ -94,7 +95,7 @@ func Update(username string, password string, passwordControle string, apiKey st
 
 	if "" != apiKey {
 		if 18 < len(apiKey) {
-			return errors.New("Password and controle password dont match. Please correct and retry")
+			return errors.New("API Key to short - it should at least be of length 18. Please correct and retry")
 		}
 
 		// do we have an associated api token yet?
@@ -129,17 +130,20 @@ func Update(username string, password string, passwordControle string, apiKey st
 func GetUserListBySearch(search string) transport.Transport {
 	ret := transport.Transport{
 		Entities: []transport.TransportEntity{},
+		Amount:   0,
 	}
 
-	users := query.Execute(query.New().Read("User").Match("Value", "contain", search))
+	users := query.Execute(query.New().Read("User").Match("Value", "contain", search).CanTo(query.New().Read("ApiKey")))
 	if 0 < len(users.Entities) {
 		for _, user := range users.Entities {
 			ret.Entities = append(ret.Entities, transport.TransportEntity{
-				ID:      user.ID,
-				Value:   user.Value,
-				Context: user.Context,
+				ID:             user.ID,
+				Value:          user.Value,
+				Context:        user.Context,
+				ChildRelations: user.ChildRelations,
 			})
 		}
+		ret.Amount = users.Amount
 	}
 	return ret
 }

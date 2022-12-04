@@ -62,9 +62,10 @@ func ValidateUserAuthToken(username string, token string) bool {
 	checkTime := strconv.FormatInt(time.Now().UTC().Unix()-tokenLifetime, 10)
 	ret := query.Execute(
 		query.New().Read("User").Match("Value", "==", username).To(
-			query.New().Read("Token").Match("Value", "==", token).Match("time", ">", checkTime),
+			query.New().Read("Token").Match("Value", "==", token).Match("Properties.time", ">", checkTime),
 		),
 	)
+
 	if 0 == len(ret.Entities) {
 		return false
 	}
