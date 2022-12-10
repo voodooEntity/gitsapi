@@ -88,7 +88,7 @@ func ValidateApiKey(username string, apikey string) bool {
 		return false
 	}
 
-	ret := query.Execute(query.New().Read("User").Match("Value", "==", username).To(query.New().Read("ApiKey").Match("Value", "==", apikey)))
+	ret := query.Execute(query.New().Read("User").Match("Value", "==", username).Match("Properties.ApiKey", "==", apikey))
 	if 0 == len(ret.Entities) {
 		return false
 	}
