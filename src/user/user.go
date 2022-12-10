@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"github.com/voodooEntity/archivist"
 	"github.com/voodooEntity/gits"
 	"github.com/voodooEntity/gits/src/query"
 	"github.com/voodooEntity/gits/src/transport"
@@ -28,7 +29,8 @@ func Create(username string, password string, passwordControle string, apiKey st
 	if 8 > len(password) {
 		return -1, errors.New("Password is to short. Please use at least a username length of 8 characters or longer")
 	}
-
+	archivist.Debug("Password provided for new user", password)
+	archivist.Debug("PasswordControle provided for new user", passwordControle)
 	if password != passwordControle {
 		return -1, errors.New("Password and controle password dont match. Please correct and retry")
 	}
