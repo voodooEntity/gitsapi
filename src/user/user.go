@@ -41,6 +41,7 @@ func Create(username string, password string, passwordControle string, apiKey st
 
 	userEntity := transport.TransportEntity{
 		ID:         -1,
+		Type:       "User",
 		Value:      username,
 		Properties: map[string]string{"Password": passwordHash, "Salt": salt, "Token": "", "TokenTime": ""},
 	}
