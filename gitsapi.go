@@ -1379,7 +1379,7 @@ func Start() {
 		}
 
 		// finally we gonne send our response
-		respond(string(user), 200, w)
+		respond(strconv.Itoa(user), 200, w)
 	})
 
 	ServeMux.HandleFunc("/v1/user/update", func(w http.ResponseWriter, r *http.Request) {
