@@ -1370,7 +1370,7 @@ func Start() {
 			http.Error(w, "Invalid json query object "+err.Error(), 422)
 			return
 		}
-		archivist.Debug("User data as parsed from provided json @ user create api", usr)
+
 		usr2, err := user.Create(usr.Name, usr.Password, usr.PasswordControle, usr.ApiKey)
 		if nil != err {
 			archivist.Error("Could not create user", err.Error())
