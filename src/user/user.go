@@ -52,8 +52,8 @@ func Create(username string, password string, passwordControle string, apiKey st
 		userEntity.Properties["ApiKey"] = apiKey
 	}
 
-	user := gits.MapTransportData(userEntity)
-	return user.ID, nil
+	usr := gits.MapTransportData(userEntity)
+	return usr.ID, nil
 }
 
 func Update(username string, password string, passwordControle string, apiKey string) error {
