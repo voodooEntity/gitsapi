@@ -46,7 +46,7 @@ func Create(username string, password string, passwordControle string, apiKey st
 	}
 
 	if "" != apiKey {
-		if 18 < len([]rune(apiKey)) {
+		if 18 > len([]rune(apiKey)) {
 			return -1, errors.New("Provided API Key is to short. Should be length 18 or longer")
 		}
 		userEntity.Properties["ApiKey"] = apiKey
