@@ -1634,18 +1634,18 @@ func buildListenConfigString() string {
 }
 
 func handleAuth(r *http.Request) bool {
-	username := r.Header.Get("GITSAPI_AUTH_USER")
+	username := r.Header.Get("GITSAPI-AUTH-USER")
 	if "" == username {
 		archivist.Info("trying to access API without username given.")
 		return false
 	}
 
-	token := r.Header.Get("GITSAPI_AUTH_TOKEN")
+	token := r.Header.Get("GITSAPI-AUTH-TOKEN")
 	if "" != token {
 		return auth.ValidateUserAuthToken(username, token)
 	}
 
-	apikey := r.Header.Get("GITSAPI_AUTH_APIKEY")
+	apikey := r.Header.Get("GITSAPI-AUTH-APIKEY")
 	if "" != apikey {
 		return auth.ValidateApiKey(username, apikey)
 	}
