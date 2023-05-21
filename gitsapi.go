@@ -1634,6 +1634,11 @@ func buildListenConfigString() string {
 }
 
 func handleAuth(r *http.Request) bool {
+	// first we check if auth is active
+	if "no" == config.GetValue("AUTH_ACTIVE") {
+		return true
+	}
+
 	username := r.Header.Get("GITSAPI-AUTH-USER")
 	if "" == username {
 		archivist.Info("trying to access API without username given.")

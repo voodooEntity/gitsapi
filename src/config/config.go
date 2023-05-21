@@ -2,29 +2,49 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
+	"github.com/voodooEntity/archivist"
 	"io/ioutil"
 	"os"
 )
 
 var Data = make(map[string]string)
-var requiredConfigs = [11]string{"HOST", "PORT", "PERSISTENCE", "LOG_TARGET", "LOG_PATH", "LOG_LEVEL", "CORS_HEADER", "CORS_ORIGIN", "SSL_CERT_FILE", "SSL_KEY_FILE", "TOKEN_LIFETIME"}
+var requiredConfigs = [12]string{"HOST", "PORT", "PERSISTENCE", "LOG_TARGET", "LOG_PATH", "LOG_LEVEL", "CORS_HEADER", "CORS_ORIGIN", "SSL_CERT_FILE", "SSL_KEY_FILE", "TOKEN_LIFETIME", "AUTH_ACTIVE"}
 
-func Init() {
+func Init(params map[string]string) {
+	// given config it gets used as a sub-library and won't have
+	// its own config file
+	handleConfigParams(params)
+
 	// first lets check if there is a parseable config file
 	handleConfigFile()
 
 	// now we try to get the params from env, priority env > config
 	handleEnv()
+
+	// validate that all necessary params have been set
+	for _, val := range requiredConfigs {
+		if _, ok := Data[val]; !ok {
+			archivist.Error("Missing required config for gitsapi ", val)
+			os.Exit(0)
+		}
+	}
 }
 
 func GetValue(key string) string {
 	val, exist := Data[key]
 	if !exist {
-		fmt.Printf("> Missing config %s exiting server.", key)
+		archivist.ErrorF("> Missing config %s exiting server.", key)
 		os.Exit(0)
 	}
 	return val
+}
+
+func handleConfigParams(params map[string]string) {
+	if 0 < len(params) {
+		for key, value := range params {
+			Data[key] = value
+		}
+	}
 }
 
 func handleEnv() {
@@ -41,7 +61,7 @@ func handleConfigFile() {
 	// first we read the json data
 	data, err := ioutil.ReadFile("config.json")
 	if nil != err {
-		fmt.Print("> Config file could not be found or is not readable")
+		archivist.Error("> Config file could not be found or is not readable")
 		os.Exit(0)
 		return
 	}
@@ -50,7 +70,7 @@ func handleConfigFile() {
 	Conf := make(map[string]string)
 	err = json.Unmarshal(data, &Conf)
 	if nil != err {
-		fmt.Print("> Config file content is not a valid json")
+		archivist.Error("> Config file content is not a valid json")
 		os.Exit(0)
 		return
 	}
