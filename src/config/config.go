@@ -58,7 +58,13 @@ func handleEnv() {
 }
 
 func handleConfigFile() {
-	// first we read the json data
+	// first we check if there is a config file
+	if _, err := os.Stat("config.json"); os.IsNotExist(err) {
+		//there is no config file so we stop here
+		return
+	}
+
+	// now we read the json data
 	data, err := ioutil.ReadFile("config.json")
 	if nil != err {
 		archivist.Error("> Config file could not be found or is not readable")
