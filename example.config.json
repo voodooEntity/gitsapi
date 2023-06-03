@@ -10,5 +10,6 @@
   "SSL_CERT_FILE" : "",
   "SSL_KEY_FILE" : "",
   "TOKEN_LIFETIME" : "3600",
-  "AUTH_ACTIVE" : "yes"
+  "AUTH_ACTIVE" : "yes",
+  "PROTOCOL" : "http"
 }

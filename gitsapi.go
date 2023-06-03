@@ -11,6 +11,7 @@ import (
 	"github.com/voodooEntity/gitsapi/src/user"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/voodooEntity/archivist"
@@ -1551,7 +1552,15 @@ func Start() {
 	// config values and print it - than listen
 	connectString := buildListenConfigString()
 	archivist.Info("> Server listening settings by config (" + connectString + ")")
-	http.ListenAndServeTLS(connectString, config.GetValue("SSL_CERT_FILE"), config.GetValue("SSL_KEY_FILE"), ServeMux)
+	if "https" == config.GetValue("PROTOCOL") {
+		http.ListenAndServeTLS(connectString, config.GetValue("SSL_CERT_FILE"), config.GetValue("SSL_KEY_FILE"), ServeMux)
+	} else if "http" == config.GetValue("PROTOCOL") {
+		http.ListenAndServe(connectString, ServeMux)
+	} else {
+		archivist.Error("Unknown server protocol given (valid http / https) - given: " + config.GetValue("PROTOCOL"))
+		os.Exit(0)
+	}
+
 }
 
 func getOptionalUrlParams(optionalUrlParams map[string]string, urlParams map[string]string, r *http.Request) map[string]string {
