@@ -2,5 +2,7 @@ github.com/voodooEntity/archivist v1.0.2 h1:QesszRfOPdGmkT1ieAXa6LkRkch/22R/LPTu
 github.com/voodooEntity/archivist v1.0.2/go.mod h1:Kw+7tEDicfscFX3Kl4wzTmICO66MjWxpXlFEP3UJCGc=
 github.com/voodooEntity/gits v0.0.24-0.20241108191754-05359630bca1 h1:jUD/GUXdMlcx2YQoTnd/HLoifkaJOMuRGfWkAsYvKCg=
 github.com/voodooEntity/gits v0.0.24-0.20241108191754-05359630bca1/go.mod h1:VB7qpYFyIXzP9pO9IukCGTg7mJ9FLlpXY6dqsCu1LlY=
+github.com/voodooEntity/gits v0.9.1 h1:V5fv04lUQVD2qrbm5kziC2b7etu5BOmMFWTx1QWbook=
+github.com/voodooEntity/gits v0.9.1/go.mod h1:VB7qpYFyIXzP9pO9IukCGTg7mJ9FLlpXY6dqsCu1LlY=
 golang.org/x/crypto v0.9.0 h1:LF6fAI+IutBocDJ2OT0Q1g8plpYljMZ4+lty+dsqw3g=
 golang.org/x/crypto v0.9.0/go.mod h1:yrmDGqONDYtNj3tH8X9dzUun2m2lzPa9ngI6/RUPGR0=
