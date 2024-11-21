@@ -52,7 +52,7 @@ func Create(username string, password string, passwordControle string, apiKey st
 		userEntity.Properties["ApiKey"] = apiKey
 	}
 
-	usr := gits.MapTransportData(userEntity)
+	usr := gits.GetDefault().MapData(userEntity)
 	return usr.ID, nil
 }
 
@@ -77,7 +77,7 @@ func Update(username string, password string, passwordControle string, apiKey st
 		}
 
 		qry := query.New().Update("User").Match("Value", "==", username).Set("Properties.Password", passwordHash).Set("Properties.Salt", salt)
-		query.Execute(qry)
+		gits.GetDefault().Query().Execute(qry)
 	}
 
 	if "" != apiKey {
@@ -85,7 +85,7 @@ func Update(username string, password string, passwordControle string, apiKey st
 			return errors.New("API Key to short - it should at least be of length 18. Please correct and retry")
 		}
 		qry := query.New().Update("User").Match("Value", "==", username).Set("Properties.ApiKey", apiKey)
-		query.Execute(qry)
+		gits.GetDefault().Query().Execute(qry)
 	}
 
 	return nil
@@ -97,7 +97,7 @@ func GetUserListBySearch(search string) transport.Transport {
 		Amount:   0,
 	}
 
-	users := query.Execute(query.New().Read("User").Match("Value", "contain", search))
+	users := gits.GetDefault().Query().Execute(query.New().Read("User").Match("Value", "contain", search))
 	if 0 < len(users.Entities) {
 		for _, user := range users.Entities {
 			ret.Entities = append(ret.Entities, transport.TransportEntity{
@@ -113,7 +113,7 @@ func GetUserListBySearch(search string) transport.Transport {
 }
 
 func usernameExists(username string) bool {
-	ret, _ := gits.GetEntitiesByTypeAndValue("User", username, "match", "")
+	ret, _ := gits.GetDefault().Storage().GetEntitiesByTypeAndValue("User", username, "match", "")
 	if 0 < len(ret) {
 		return true
 	}
