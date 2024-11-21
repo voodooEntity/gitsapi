@@ -20,9 +20,12 @@ import (
 
 var ServeMux = http.NewServeMux()
 
+var gi *gits.Gits
+
 func Start() {
 	archivist.Info("> Bootin HTTP API")
 	auth.Setup()
+	gi = gits.GetDefault()
 
 	// Route: /v1/ping
 	ServeMux.HandleFunc("/v1/ping", func(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +70,7 @@ func Start() {
 
 		// lets pass the body to our mapper
 		// that will recursive map the entities
-		responseData := gits.MapTransportData(transportData)
+		responseData := gi.MapData(transportData)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
@@ -117,7 +120,7 @@ func Start() {
 
 		// lets pass the body to our mapper
 		// that will recursive map the entities
-		responseData := query.Execute(&qry)
+		responseData := gi.Query().Execute(&qry)
 
 		respondOk(responseData, w)
 	})
@@ -168,14 +171,14 @@ func Start() {
 		}
 
 		// get type id for given string
-		typeID, err := gits.GetTypeIdByString(urlParams["type"])
+		typeID, err := gi.Storage().GetTypeIdByString(urlParams["type"])
 		if nil != err {
 			http.Error(w, string(err.Error()), 404)
 			return
 		}
 
 		// read the data
-		data, err := gits.GetEntityByPath(typeID, id, "")
+		data, err := gi.Storage().GetEntityByPath(typeID, id, "")
 
 		// if error respond
 		if nil != err {
@@ -184,7 +187,7 @@ func Start() {
 		}
 
 		// retrieve the type string
-		typeStr, err := gits.GetTypeStringById(data.Type)
+		typeStr, err := gi.Storage().GetTypeStringById(data.Type)
 		if err != nil {
 			http.Error(w, string(err.Error()), 404)
 			return
@@ -241,7 +244,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(newEntity.Type)
+		typeID, err := gi.Storage().GetTypeIdByString(newEntity.Type)
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -249,7 +252,7 @@ func Start() {
 		}
 
 		// finally we create the entity
-		newID, err := gits.CreateEntity(types.StorageEntity{
+		newID, err := gi.Storage().CreateEntity(types.StorageEntity{
 			Type:       typeID,
 			ID:         -1,
 			Properties: newEntity.Properties,
@@ -319,7 +322,7 @@ func Start() {
 		}
 
 		// ok we seem to be fine on types, lets call the actual getter method
-		entities, err := gits.GetEntitiesByType(urlParams["type"], context)
+		entities, err := gi.Storage().GetEntitiesByType(urlParams["type"], context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
@@ -399,7 +402,7 @@ func Start() {
 		}
 
 		// ok we seem to be fine on types, lets call the actual getter method
-		entities, err := gits.GetEntitiesByTypeAndValue(urlParams["type"], urlParams["value"], mode, context)
+		entities, err := gi.Storage().GetEntitiesByTypeAndValue(urlParams["type"], urlParams["value"], mode, context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
@@ -465,7 +468,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(urlParams["type"])
+		typeID, err := gi.Storage().GetTypeIdByString(urlParams["type"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -473,7 +476,7 @@ func Start() {
 		}
 
 		// finally we delete the entity
-		gits.DeleteEntity(typeID, id)
+		gi.Storage().DeleteEntity(typeID, id)
 
 		respond("", 200, w)
 	})
@@ -514,7 +517,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(newEntity.Type)
+		typeID, err := gi.Storage().GetTypeIdByString(newEntity.Type)
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -522,7 +525,7 @@ func Start() {
 		}
 
 		// finally we update the entity
-		err = gits.UpdateEntity(types.StorageEntity{
+		err = gi.Storage().UpdateEntity(types.StorageEntity{
 			Type:       typeID,
 			ID:         newEntity.ID,
 			Value:      newEntity.Value,
@@ -593,7 +596,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(urlParams["type"])
+		typeID, err := gi.Storage().GetTypeIdByString(urlParams["type"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -601,7 +604,7 @@ func Start() {
 		}
 
 		// retrieve the child entities if given
-		childRelations, err := gits.GetChildRelationsBySourceTypeAndSourceId(typeID, id, context)
+		childRelations, err := gi.Storage().GetChildRelationsBySourceTypeAndSourceId(typeID, id, context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
@@ -613,7 +616,7 @@ func Start() {
 		}
 
 		for _, val := range childRelations {
-			entity, err := gits.GetEntityByPath(val.TargetType, val.TargetID, "")
+			entity, err := gi.Storage().GetEntityByPath(val.TargetType, val.TargetID, "")
 			if nil != err {
 				returnData.Entities = append(returnData.Entities, transport.TransportEntity{
 					ID:         entity.ID,
@@ -683,7 +686,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(urlParams["type"])
+		typeID, err := gi.Storage().GetTypeIdByString(urlParams["type"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -691,7 +694,7 @@ func Start() {
 		}
 
 		// retrieve the child entities if given
-		parentRelations, err := gits.GetParentRelationsByTargetTypeAndTargetId(typeID, id, context)
+		parentRelations, err := gi.Storage().GetParentRelationsByTargetTypeAndTargetId(typeID, id, context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
@@ -703,7 +706,7 @@ func Start() {
 		}
 
 		for _, val := range parentRelations {
-			entity, err := gits.GetEntityByPath(val.SourceType, val.SourceID, "")
+			entity, err := gi.Storage().GetEntityByPath(val.SourceType, val.SourceID, "")
 			if nil != err {
 				returnData.Entities = append(returnData.Entities, transport.TransportEntity{
 					ID:         entity.ID,
@@ -773,7 +776,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(urlParams["type"])
+		typeID, err := gi.Storage().GetTypeIdByString(urlParams["type"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -781,14 +784,14 @@ func Start() {
 		}
 
 		// retrieve the child entities if given
-		relations, err := gits.GetParentRelationsByTargetTypeAndTargetId(typeID, id, context)
+		relations, err := gi.Storage().GetParentRelationsByTargetTypeAndTargetId(typeID, id, context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
 		}
 
 		// since we could have every possible type in our results we gonne go the easy way and retrieve all entity types for easier result translation
-		entityTypes := gits.GetEntityTypes()
+		entityTypes := gi.Storage().GetEntityTypes()
 
 		// prepare return data and write retrieved relations into the fitting format
 		returnData := transport.Transport{
@@ -863,7 +866,7 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		typeID, err := gits.GetTypeIdByString(urlParams["type"])
+		typeID, err := gi.Storage().GetTypeIdByString(urlParams["type"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -871,14 +874,14 @@ func Start() {
 		}
 
 		// retrieve the child entities if given
-		relations, err := gits.GetChildRelationsBySourceTypeAndSourceId(typeID, id, context)
+		relations, err := gi.Storage().GetChildRelationsBySourceTypeAndSourceId(typeID, id, context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
 		}
 
 		// since we could have every possible type in our results we gonne go the easy way and retrieve all entity types for easier result translation
-		entityTypes := gits.GetEntityTypes()
+		entityTypes := gi.Storage().GetEntityTypes()
 
 		// prepare return data and write retrieved relations into the fitting format
 		returnData := transport.Transport{
@@ -951,20 +954,20 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		srcTypeID, err := gits.GetTypeIdByString(urlParams["srcType"])
+		srcTypeID, err := gi.Storage().GetTypeIdByString(urlParams["srcType"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
 			return
 		}
-		targetTypeID, err := gits.GetTypeIdByString(urlParams["targetType"])
+		targetTypeID, err := gi.Storage().GetTypeIdByString(urlParams["targetType"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
 			return
 		}
 
-		relation, err := gits.GetRelation(srcTypeID, srcID, targetTypeID, targetID)
+		relation, err := gi.Storage().GetRelation(srcTypeID, srcID, targetTypeID, targetID)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
@@ -1038,14 +1041,14 @@ func Start() {
 		}
 
 		// retrieve the entities
-		entities, err := gits.GetEntitiesByValue(urlParams["value"], mode, context)
+		entities, err := gi.Storage().GetEntitiesByValue(urlParams["value"], mode, context)
 		if nil != err {
 			http.Error(w, err.Error(), 422)
 			return
 		}
 
 		// since we could have every possible type in our results we gonne go the easy way and retrieve all entity types for easier result translation
-		entityTypes := gits.GetEntityTypes()
+		entityTypes := gi.Storage().GetEntityTypes()
 
 		// write return data
 		returnData := transport.Transport{
@@ -1087,7 +1090,7 @@ func Start() {
 		}
 
 		// retrieve all entity types
-		types := gits.GetEntityTypes()
+		types := gi.Storage().GetEntityTypes()
 
 		// than we gonne json encode it
 		// build the json
@@ -1136,13 +1139,13 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		srcTypeID, err := gits.GetTypeIdByString(newRelation.SourceType)
+		srcTypeID, err := gi.Storage().GetTypeIdByString(newRelation.SourceType)
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
 			return
 		}
-		targetTypeID, err := gits.GetTypeIdByString(newRelation.TargetType)
+		targetTypeID, err := gi.Storage().GetTypeIdByString(newRelation.TargetType)
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -1150,7 +1153,7 @@ func Start() {
 		}
 
 		// finally we update the entity
-		_, err = gits.UpdateRelation(srcTypeID, newRelation.SourceID, targetTypeID, newRelation.TargetID, types.StorageRelation{
+		_, err = gi.Storage().UpdateRelation(srcTypeID, newRelation.SourceID, targetTypeID, newRelation.TargetID, types.StorageRelation{
 			SourceID:   newRelation.SourceID,
 			SourceType: srcTypeID,
 			TargetID:   newRelation.TargetID,
@@ -1203,13 +1206,13 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		srcTypeID, err := gits.GetTypeIdByString(newRelation.SourceType)
+		srcTypeID, err := gi.Storage().GetTypeIdByString(newRelation.SourceType)
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
 			return
 		}
-		targetTypeID, err := gits.GetTypeIdByString(newRelation.TargetType)
+		targetTypeID, err := gi.Storage().GetTypeIdByString(newRelation.TargetType)
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -1217,7 +1220,7 @@ func Start() {
 		}
 
 		// finally we update the entity
-		_, err = gits.CreateRelation(srcTypeID, newRelation.SourceID, targetTypeID, newRelation.TargetID, types.StorageRelation{
+		_, err = gi.Storage().CreateRelation(srcTypeID, newRelation.SourceID, targetTypeID, newRelation.TargetID, types.StorageRelation{
 			SourceID:   newRelation.SourceID,
 			SourceType: srcTypeID,
 			TargetID:   newRelation.TargetID,
@@ -1279,13 +1282,13 @@ func Start() {
 		}
 
 		// translate the type from string to id
-		srcTypeID, err := gits.GetTypeIdByString(requiredUrlParams["srcType"])
+		srcTypeID, err := gi.Storage().GetTypeIdByString(requiredUrlParams["srcType"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
 			return
 		}
-		targetTypeID, err := gits.GetTypeIdByString(requiredUrlParams["targetType"])
+		targetTypeID, err := gi.Storage().GetTypeIdByString(requiredUrlParams["targetType"])
 		if nil != err {
 			// handle error
 			http.Error(w, err.Error(), 422)
@@ -1293,7 +1296,7 @@ func Start() {
 		}
 
 		// finally we delete the entity
-		gits.DeleteRelation(srcTypeID, srcID, targetTypeID, targetID)
+		gi.Storage().DeleteRelation(srcTypeID, srcID, targetTypeID, targetID)
 
 		respond("", 200, w)
 	})
@@ -1479,7 +1482,7 @@ func Start() {
 		}
 
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
-		amount := gits.GetEntityAmount()
+		amount := gi.Storage().GetEntityAmount()
 		respond(strconv.Itoa(amount), 200, w)
 	})
 
@@ -1508,7 +1511,7 @@ func Start() {
 			return
 		}
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
-		entityTypes := gits.GetEntityRTypes()
+		entityTypes := gi.Storage().GetEntityRTypes()
 		// we should have a way to compare instead of checking an index, this could have
 		// overflow/escap/bug chances
 		if _, ok := entityTypes[urlParams["type"]]; !ok {
@@ -1516,26 +1519,7 @@ func Start() {
 		}
 
 		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
-		amount, _ := gits.GetEntityAmountByType(entityTypes[urlParams["type"]])
-		respond(strconv.Itoa(amount), 200, w)
-	})
-
-	// Route: /v1/statistics/getAmountPersistencePayloadsPending
-	ServeMux.HandleFunc("/v1/statistics/getAmountPersistencePayloadsPending", func(w http.ResponseWriter, r *http.Request) {
-		if !handleAuth(r) {
-			respond("", 401, w)
-			return
-		}
-
-		if "" != config.GetValue("CORS_ORIGIN") || "" != config.GetValue("CORS_HEADER") {
-			if "OPTIONS" == r.Method {
-				respond("", 200, w)
-				return
-			}
-		}
-
-		// calling storage directly from API is very bad ### bad bad entity change this and move to mapper
-		amount := gits.GetAmountPersistencePayloadsPending()
+		amount, _ := gi.Storage().GetEntityAmountByType(entityTypes[urlParams["type"]])
 		respond(strconv.Itoa(amount), 200, w)
 	})
 

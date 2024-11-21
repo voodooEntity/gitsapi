@@ -16,7 +16,7 @@ import (
 )
 
 func Login(username string, password string) (string, error) {
-	user, err := gits.GetEntitiesByTypeAndValue("User", username, "match", "")
+	user, err := gits.GetDefault().Storage().GetEntitiesByTypeAndValue("User", username, "match", "")
 	if nil != err {
 		return "", err
 	}
@@ -30,7 +30,7 @@ func Login(username string, password string) (string, error) {
 	}
 
 	token := randomString(20)
-	gits.MapTransportData(transport.TransportEntity{
+	gits.GetDefault().MapData(transport.TransportEntity{
 		ID:    0,
 		Type:  "User",
 		Value: username,
@@ -57,10 +57,10 @@ func ValidateUserAuthToken(username string, token string) bool {
 		os.Exit(0)
 		return false
 	}
-	query.Execute(query.New().Read("User").Match("Value", "==", username))
+	gits.GetDefault().Query().Execute(query.New().Read("User").Match("Value", "==", username))
 
 	checkTime := strconv.FormatInt(time.Now().UTC().Unix()-tokenLifetime, 10)
-	ret := query.Execute(
+	ret := gits.GetDefault().Query().Execute(
 		query.New().Read("User").Match("Value", "==", username).To(
 			query.New().Read("Token").Match("Value", "==", token).Match("Properties.time", ">", checkTime),
 		),
@@ -88,7 +88,7 @@ func ValidateApiKey(username string, apikey string) bool {
 		return false
 	}
 
-	ret := query.Execute(query.New().Read("User").Match("Value", "==", username).Match("Properties.ApiKey", "==", apikey))
+	ret := gits.GetDefault().Query().Execute(query.New().Read("User").Match("Value", "==", username).Match("Properties.ApiKey", "==", apikey))
 	if 0 == len(ret.Entities) {
 		return false
 	}
@@ -97,7 +97,7 @@ func ValidateApiKey(username string, apikey string) bool {
 }
 
 func Setup() {
-	ret := query.Execute(query.New().Read("User"))
+	ret := gits.GetDefault().Query().Execute(query.New().Read("User"))
 	if 0 == len(ret.Entities) {
 		defaultPwd, salt, err := HashPassword("logmein")
 		if nil != err {
@@ -105,13 +105,14 @@ func Setup() {
 			os.Exit(0)
 		}
 
-		gits.MapTransportData(transport.TransportEntity{
+		gits.GetDefault().MapData(transport.TransportEntity{
 			ID:         -1,
 			Type:       "User",
 			Value:      "default",
 			Context:    "autoinserted",
 			Properties: map[string]string{"Password": defaultPwd, "Salt": salt},
 		})
+
 		archivist.Info("Created default user")
 	}
 }
