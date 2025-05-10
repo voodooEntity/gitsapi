@@ -4,5 +4,7 @@ github.com/voodooEntity/gits v0.0.24-0.20241108191754-05359630bca1 h1:jUD/GUXdMl
 github.com/voodooEntity/gits v0.0.24-0.20241108191754-05359630bca1/go.mod h1:VB7qpYFyIXzP9pO9IukCGTg7mJ9FLlpXY6dqsCu1LlY=
 github.com/voodooEntity/gits v0.9.1 h1:V5fv04lUQVD2qrbm5kziC2b7etu5BOmMFWTx1QWbook=
 github.com/voodooEntity/gits v0.9.1/go.mod h1:VB7qpYFyIXzP9pO9IukCGTg7mJ9FLlpXY6dqsCu1LlY=
+github.com/voodooEntity/gits v0.9.5 h1:psQe0LyOcU15Jm8Np6jzox24MjzB5mkQw8hDLp+I1Ok=
+github.com/voodooEntity/gits v0.9.5/go.mod h1:VB7qpYFyIXzP9pO9IukCGTg7mJ9FLlpXY6dqsCu1LlY=
 golang.org/x/crypto v0.9.0 h1:LF6fAI+IutBocDJ2OT0Q1g8plpYljMZ4+lty+dsqw3g=
 golang.org/x/crypto v0.9.0/go.mod h1:yrmDGqONDYtNj3tH8X9dzUun2m2lzPa9ngI6/RUPGR0=
