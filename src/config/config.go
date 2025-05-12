@@ -8,18 +8,17 @@ import (
 )
 
 var Data = make(map[string]string)
-var requiredConfigs = [13]string{"HOST", "PORT", "PERSISTENCE", "LOG_TARGET", "LOG_PATH", "LOG_LEVEL", "CORS_HEADER", "CORS_ORIGIN", "SSL_CERT_FILE", "SSL_KEY_FILE", "TOKEN_LIFETIME", "AUTH_ACTIVE", "PROTOCOL"}
+var requiredConfigs = [10]string{"HOST", "PORT", "LOG_TARGET", "LOG_PATH", "LOG_LEVEL", "CORS_HEADER", "CORS_ORIGIN", "SSL_CERT_FILE", "SSL_KEY_FILE", "PROTOCOL"}
 
 func Init(params map[string]string) {
-	// given config it gets used as a sub-library and won't have
-	// its own config file
-	handleConfigParams(params)
-
 	// first lets check if there is a parseable config file
 	handleConfigFile()
 
 	// now we try to get the params from env, priority env > config
 	handleEnv()
+
+	// finally we check for direct provided params those > *
+	handleConfigParams(params)
 
 	// validate that all necessary params have been set
 	for _, val := range requiredConfigs {
@@ -59,13 +58,13 @@ func handleEnv() {
 
 func handleConfigFile() {
 	// first we check if there is a config file
-	if _, err := os.Stat("config.json"); os.IsNotExist(err) {
+	if _, err := os.Stat("gits.api.config.json"); os.IsNotExist(err) {
 		//there is no config file so we stop here
 		return
 	}
 
 	// now we read the json data
-	data, err := ioutil.ReadFile("config.json")
+	data, err := ioutil.ReadFile("gits.api.config.json")
 	if nil != err {
 		archivist.Error("> Config file could not be found or is not readable")
 		os.Exit(0)
