@@ -1,7 +1,6 @@
 {
   "HOST": "127.0.0.1",
   "PORT": "8090",
-  "PERSISTENCE": "active",
   "LOG_TARGET" : "stdout",
   "LOG_PATH" : "out.log",
   "LOG_LEVEL" : "debug",
@@ -9,7 +8,5 @@
   "CORS_ORIGIN" : "*",
   "SSL_CERT_FILE" : "",
   "SSL_KEY_FILE" : "",
-  "TOKEN_LIFETIME" : "3600",
-  "AUTH_ACTIVE" : "yes",
   "PROTOCOL" : "http"
 }
